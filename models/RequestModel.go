@@ -42,3 +42,7 @@ func (P *PhotoSearchPaginationContainerQuery) InitPhotoSearchPaginationContainer
 	P.Variables.Search = searchStr
 	P.Variables.Sort = sortStr
 }
+
+func (P *PhotoSearchPaginationContainerQuery) SetNewCursor(cursor string) {
+	P.Variables.Cursor = cursor
+}

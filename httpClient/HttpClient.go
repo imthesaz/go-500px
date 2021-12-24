@@ -6,7 +6,6 @@ import (
 	"github.com/go-500px/models"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 )
@@ -15,33 +14,69 @@ var mainQueryClient *http.Client
 
 var photoDetailsClient *http.Client
 
-func GetPhotoSearchPaginationContainer(P *models.PhotoSearchPaginationContainerQuery) {
-	mainQueryClient := &http.Client{}
+func InitHTTPClients() {
+	mainQueryClient = &http.Client{}
+	photoDetailsClient = &http.Client{}
+}
+
+func GetPhotoSearchPaginationContainer(P *models.PhotoSearchPaginationContainerQuery) (*models.GraphQLResponse, error) {
+
 	requestBody, err := json.Marshal(P)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	req, err := http.NewRequest("POST", models.BaseGraphQLURL, bytes.NewBuffer(requestBody))
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	req.Header.Set("Content-type", "application/json")
 	resp, err := mainQueryClient.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
-
 	body, err := ioutil.ReadAll(resp.Body)
+
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
-	log.Println(string(body))
+	graphqlRes := &models.GraphQLResponse{}
+	err = json.Unmarshal(body, graphqlRes)
+
+	if err != nil {
+		return nil, err
+	}
+	return graphqlRes, nil
 }
 
-func GetPhotoSearchQueryRenderer(P *models.PhotoSearchQueryRendererQuery) {
+func GetPhotoSearchQueryRenderer(P *models.PhotoSearchQueryRendererQuery) (*models.GraphQLResponse, error) {
+	requestBody, err := json.Marshal(P)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", models.BaseGraphQLURL, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, err
+	}
 
+	req.Header.Set("Content-type", "application/json")
+	resp, err := mainQueryClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	graphqlRes := &models.GraphQLResponse{}
+	err = json.Unmarshal(body, graphqlRes)
+
+	if err != nil {
+		return nil, err
+	}
+	return graphqlRes, nil
 }
 
 func DownloadPhotoFile(filepath string, url string) error {
