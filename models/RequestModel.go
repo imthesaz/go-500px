@@ -2,7 +2,8 @@ package models
 
 import "fmt"
 
-const baseURL = "https://api.500px.com/v1/photos?ids="
+const BaseGraphQLURL = "https://api.500px.com/graphql"
+const basePhotoURL = "https://api.500px.com/v1/photos?ids="
 const queryParameters = "&image_size%5B%5D=1&image_size%5B%5D=2&image_size%5B%5D=32&image_size%5B%5D=31&image_size%5B%5D=33&image_size%5B%5D=34&image_size%5B%5D=35&image_size%5B%5D=36&image_size%5B%5D=2048&image_size%5B%5D=4&image_size%5B%5D=14&include_states=1&expanded_user_info=true&include_tags=true&include_geo=true&is_following=true&include_equipment_info=true&include_licensing=true&include_releases=true&liked_by=1&include_vendor_photos=true"
 
 type PhotoSearchPaginationContainerQuery struct {
@@ -25,7 +26,7 @@ type PhotoSearchQueryRendererQuery struct {
 }
 
 func CreatePhotoInfoQuery(id string) string {
-	return fmt.Sprintf("%s%s%s", baseURL, id, queryParameters)
+	return fmt.Sprintf("%s%s%s", basePhotoURL, id, queryParameters)
 }
 
 func (P *PhotoSearchQueryRendererQuery) InitPhotoSearchQueryRendererQueryBody(searchStr string, sortStr string) {
