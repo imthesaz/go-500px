@@ -25,7 +25,7 @@ type PhotoSearchQueryRendererQuery struct {
 	Query string `json:"query"`
 }
 
-func CreatePhotoInfoQuery(id string) string {
+func CreatePhotoDetailQuery(id string) string {
 	return fmt.Sprintf("%s%s%s", basePhotoURL, id, queryParameters)
 }
 

@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var mainQueryClient *http.Client
@@ -95,4 +96,27 @@ func DownloadPhotoFile(filepath string, url string) error {
 
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+func GetPhotoDetail(id string) (*models.PhotoDetail, error) {
+
+	resp, err := photoDetailsClient.Get(models.CreatePhotoDetailQuery(id))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonStr := strings.Replace(string(body), id, "photo_info", 1)
+
+	photoDetail := &models.PhotoDetail{}
+	err = json.Unmarshal([]byte(jsonStr), photoDetail)
+
+	if err != nil {
+		return nil, err
+	}
+	return photoDetail, nil
 }
