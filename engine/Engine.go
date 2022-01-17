@@ -51,9 +51,11 @@ func photoSearchGraphQL(wg *sync.WaitGroup, photoFileURLs chan<- string, config 
 				if err != nil {
 					log.Fatalln(err)
 				}
+				log.Println("new batch downloaded ---- sort keyword : " + config.SearchConfig.Sort[i])
+				downloadedCount += 20
 				hasNextPage = graphRes.GetHasNextPage()
 				cursor = graphRes.Data.PhotoSearch.PageInfo.EndCursor
-				downloadedCount = imageCounter
+
 			} else {
 				break
 			}
