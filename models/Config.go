@@ -5,7 +5,7 @@ type Config struct {
 }
 
 type SearchConfig struct {
-	SearchTerm string `yaml:"search_term"`
-	Sort       string `yaml:"sort"`
-	Count      int    `yaml:"count"`
+	SearchTerm string   `yaml:"search_term"`
+	Sort       []string `yaml:"sort"`
+	Count      int      `yaml:"count"`
 }

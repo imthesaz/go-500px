@@ -1,4 +1,7 @@
 search_config :
-  search_term : car engine
-  sort : RELEVANCE
-  count : 100
+  search_term : flower
+  sort :
+    - RELEVANCE
+    - NEWEST
+    - PULSE
+  count : 4327520
