@@ -4,4 +4,6 @@ search_config :
     - RELEVANCE
     - NEWEST
     - PULSE
-  count : 4327520
+  count : 10000
+  photo_index : 0
+  prev_sort : RELEVANCE

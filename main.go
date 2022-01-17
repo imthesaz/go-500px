@@ -18,6 +18,6 @@ func main() {
 		log.Fatalln(err)
 	}
 	wg.Add(2)
-	engine.EngineStart(&wg, config.SearchConfig.SearchTerm, config.SearchConfig.Sort, config.SearchConfig.Count)
+	engine.Start(&wg, config)
 	wg.Wait()
 }
