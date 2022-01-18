@@ -27,7 +27,7 @@ func CreateFilePath(folderName string) {
 	FolderPath = path + "/Result/" + folderName
 }
 
-func InitCSVWriter(folderName string) error {
+func InitCSVWriter() error {
 	exists, err := exists(FolderPath + "/details.csv")
 	if err != nil {
 		log.Fatalln(err)

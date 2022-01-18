@@ -15,7 +15,10 @@ import (
 )
 
 func Start(wg *sync.WaitGroup, config models.Config) {
-	InitPhotoIDMemory()
+	err := InitPhotoIDMemory()
+	if err != nil {
+		log.Fatalln(err)
+	}
 	photoFileURLs := make(chan string, 20)
 
 	go photoSearchGraphQL(wg, photoFileURLs, config)
@@ -25,6 +28,7 @@ func Start(wg *sync.WaitGroup, config models.Config) {
 func photoSearchGraphQL(wg *sync.WaitGroup, photoFileURLs chan<- string, config models.Config) {
 	defer wg.Done()
 	imageCounter := 0
+	downloadedCount := getDownloadedCount(config.SearchConfig.PhotoIndex)
 	if config.SearchConfig.PhotoIndex != 0 {
 		imageCounter = config.SearchConfig.PhotoIndex + 1
 	}
@@ -35,13 +39,11 @@ func photoSearchGraphQL(wg *sync.WaitGroup, photoFileURLs chan<- string, config 
 	}
 	sortIDX := findSortStrIndex(config.SearchConfig.Sort, config.SearchConfig.PrevSort)
 	photoSearchPaginationContainerQuery := &models.PhotoSearchPaginationContainerQuery{}
-
 	for i := sortIDX; i < len(config.SearchConfig.Sort); i++ {
 		hasNextPage := true
-		downloadedCount := 0
 		for {
-			if hasNextPage && downloadedCount < config.SearchConfig.Count {
 
+			if hasNextPage && downloadedCount < config.SearchConfig.Count {
 				photoSearchPaginationContainerQuery.InitPhotoSearchPaginationContainerQueryBody(cursor, config.SearchConfig.SearchTerm, config.SearchConfig.Sort[i])
 				graphRes, err := httpClient.GetPhotoSearchPaginationContainer(photoSearchPaginationContainerQuery)
 				if err != nil {
@@ -51,16 +53,19 @@ func photoSearchGraphQL(wg *sync.WaitGroup, photoFileURLs chan<- string, config 
 				if err != nil {
 					log.Fatalln(err)
 				}
-				log.Println("new batch downloaded ---- sort keyword : " + config.SearchConfig.Sort[i])
+				log.Println("new batch downloaded ---- sort keyword : " + config.SearchConfig.Sort[i] + " ---- number of downloaded details : " + strconv.Itoa(downloadedCount))
 				downloadedCount += 20
 				hasNextPage = graphRes.GetHasNextPage()
 				cursor = graphRes.Data.PhotoSearch.PageInfo.EndCursor
-
 			} else {
+				cursor, err = constructInitialCursorString(0)
+				if err != nil {
+					log.Fatalln(err)
+				}
 				break
 			}
-
 		}
+		downloadedCount = 0
 	}
 }
 
@@ -98,9 +103,11 @@ func photoSearchDetail(graphQLRes *models.GraphQLResponse, photoFileURLs chan<- 
 	batchCount := 0
 	for i := 0; i < nodeLength; i++ {
 		url := graphQLRes.Data.PhotoSearch.Edges[i].Node.Images[0].URL
-		if !CheckifIDExists(url) {
-			AddIDToPhotoIDMap(url)
-
+		if !CheckIfIDExists(url) {
+			err := AddIDToPhotoIDMap(url)
+			if err != nil {
+				return err
+			}
 			photoFileURLs <- url
 			batchCount++
 			var detail []string
@@ -167,4 +174,8 @@ func constructInitialCursorString(cursor int) (string, error) {
 	}
 	return base64.StdEncoding.EncodeToString([]byte("pos-" + strconv.Itoa(int(nextCursor)))), nil
 
+}
+
+func getDownloadedCount(cursor int) int {
+	return int(math.Ceil(float64(cursor)/20.0) * 20)
 }

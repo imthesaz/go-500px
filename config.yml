@@ -5,5 +5,5 @@ search_config :
     - NEWEST
     - PULSE
   count : 10000
-  photo_index : 9979
+  photo_index : 9000
   prev_sort : RELEVANCE

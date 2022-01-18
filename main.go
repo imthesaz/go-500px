@@ -13,7 +13,11 @@ func main() {
 	config, err := utils.ParseSearchConfigFile("config.yml")
 	httpClient.InitHTTPClients()
 	utils.CreateFilePath(config.SearchConfig.SearchTerm)
-	err = utils.InitCSVWriter(config.SearchConfig.SearchTerm)
+	err = utils.InitCSVWriter()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = utils.CreateHistoryFile()
 	if err != nil {
 		log.Fatalln(err)
 	}
