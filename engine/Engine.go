@@ -85,8 +85,11 @@ func photoDownload(wg *sync.WaitGroup, photoFileURLs <-chan string, config model
 	for {
 		if imageCounter != limit {
 			url := <-photoFileURLs
-
-			err := httpClient.DownloadPhotoFile(utils.FolderPath+"/"+strconv.Itoa(imageCounter)+".jpg", url)
+			err := AddIDToPhotoIDMap(url)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			err = httpClient.DownloadPhotoFile(utils.FolderPath+"/"+strconv.Itoa(imageCounter)+".jpg", url)
 			if err != nil {
 				log.Fatalln(err)
 			}
@@ -104,10 +107,7 @@ func photoSearchDetail(graphQLRes *models.GraphQLResponse, photoFileURLs chan<- 
 	for i := 0; i < nodeLength; i++ {
 		url := graphQLRes.Data.PhotoSearch.Edges[i].Node.Images[0].URL
 		if !CheckIfIDExists(url) {
-			err := AddIDToPhotoIDMap(url)
-			if err != nil {
-				return err
-			}
+
 			photoFileURLs <- url
 			batchCount++
 			var detail []string
