@@ -7,3 +7,6 @@ search_config :
   count : 10000
   photo_index : 9000
   prev_sort : RELEVANCE
+
+
+

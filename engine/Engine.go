@@ -30,7 +30,7 @@ func photoSearchGraphQL(wg *sync.WaitGroup, photoFileURLs chan<- string, config 
 	imageCounter := 0
 	downloadedCount := getDownloadedCount(config.SearchConfig.PhotoIndex)
 	if config.SearchConfig.PhotoIndex != 0 {
-		imageCounter = config.SearchConfig.PhotoIndex + 1
+		imageCounter = (config.SearchConfig.PhotoIndex % 10000) + 1
 	}
 
 	cursor, err := constructInitialCursorString(config.SearchConfig.PhotoIndex)
